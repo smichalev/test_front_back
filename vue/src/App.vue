@@ -1,11 +1,11 @@
 <template>
-	<div id="app">
+	<v-app>
 		<router-link to="/">Главная</router-link>
 		<router-link to="/login">Логин</router-link>
 		<router-link to="/registration">Регистрация</router-link>
 		<router-link to="/forgot__password">Восстановить пароль</router-link>
 		<router-view></router-view>
-	</div>
+	</v-app>
 </template>
 
 <script>
