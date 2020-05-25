@@ -3,7 +3,10 @@ import App from './App.vue';
 import router from './routers/router';
 import store from './store';
 import vuetify from './plugins/vuetify';
+import axios from './plugins/axios';
 
+Vue.prototype.$http = axios;
+Vue.prototype.$address = 'http://localhost:7777/api';
 Vue.config.productionTip = false;
 
 new Vue({

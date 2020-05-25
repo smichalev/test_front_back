@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const config = require(path.join(__dirname, 'config'));
 
@@ -20,14 +21,22 @@ const config = require(path.join(__dirname, 'config'));
 
 const app = express();
 
+app.use(cors({
+	origin: ['http://127.0.0.1:7777', 'http://localhost:7777'],
+	credentials: true,
+}));
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'templates'));
 app.use(express.static('assets'));
+
 app.use(session({
 	resave: true,
 	saveUninitialized: true,
-	secret: config.sessionkey,
+	secret: 'secret',
+	cookie: {maxAge: 24 * 60 * 60 * 1000},
 }));
+
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
