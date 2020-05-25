@@ -1,9 +1,11 @@
 const path = require('path');
-const {User} = require(path.join(__dirname, '..', 'models'));
+const {User, Request} = require(path.join(__dirname, '..', 'models'));
 const ErrorList = require(path.join(__dirname, '..', 'errors', 'error.list'));
 const md5 = require('md5');
 const jwt = require('jsonwebtoken');
 const config = require(path.join(__dirname, '..', 'config'));
+const nodemailer = require('nodemailer');
+const randomValue = require(path.join(__dirname, '..', 'lib', 'randomValue'));
 
 module.exports = (app) => {
 	app.get('/', (req, res, next) => {
@@ -15,7 +17,10 @@ module.exports = (app) => {
 	app.get('/registration', (req, res, next) => {
 		res.render('index');
 	});
-	app.get('/forgot__password', (req, res, next) => {
+	app.get('/forgot', (req, res, next) => {
+		res.render('index');
+	});
+	app.get('/reset', (req, res, next) => {
 		res.render('index');
 	});
 	
@@ -56,7 +61,7 @@ module.exports = (app) => {
 				throw new ErrorList(ErrorList.CODES.NOT_VALID_EMAIL);
 			}
 			
-			if(!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]){8,}/g.test(password)) {
+			if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]){8,}/g.test(password)) {
 				throw new ErrorList(ErrorList.CODES.NOT_VALID_PASSWORD);
 			}
 			
@@ -98,7 +103,7 @@ module.exports = (app) => {
 				throw new ErrorList(ErrorList.CODES.NOT_CORRECT_QUERY);
 			}
 			
-			if(!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]){8,}/g.test(req.body.password)) {
+			if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]){8,}/g.test(req.body.password)) {
 				throw new ErrorList(ErrorList.CODES.NOT_VALID_PASSWORD);
 			}
 			
@@ -139,6 +144,116 @@ module.exports = (app) => {
 		catch (err) {
 			next(err);
 		}
+	});
+	
+	app.post('/api/forgot', async (req, res, next) => {
+		try {
+			if (!req.body.email) {
+				throw new ErrorList(ErrorList.CODES.REQUIRED_FIELD);
+			}
+			
+			let profile = await User.findOne({login: req.body.email});
+			
+			if (!profile) {
+				throw new ErrorList(ErrorList.CODES.NOT_FOUND);
+			}
+			
+			let random = randomValue();
+			
+			let smtpTransport = nodemailer.createTransport({
+				host: "smtp.yandex.ru",
+				port: 465,
+				secure: true,
+				auth: {
+					user: "testaccount123459",
+					pass: "Qq123456789",
+				},
+			});
+			
+			let mailOptions = {
+				from: 'test <testaccount123459@yandex.ru>',
+				to: req.body.email,
+				subject: 'Сброс пароля',
+				text: 'Сброс пароля',
+				html: `Ссылка для сброса пароля: http://${config.host}:${config.port}/reset?hash=${random}`,
+			};
+			
+			const request = new Request({user: profile._id, code: random});
+			
+			let result = await request.save();
+			console.log(result);
+			
+			await smtpTransport.sendMail(mailOptions);
+			
+			return res.send('ok');
+		}
+		catch (err) {
+			return next(err);
+		}
+		
+	});
+	
+	app.get('/api/reset', async (req, res, next) => {
+		if (!req.query.hash) {
+			throw new ErrorList(ErrorList.CODES.NOT_FOUND);
+		}
+		
+		let hash = await Request.findOne({code: req.query.hash});
+		
+		if (!hash) {
+			return next(new ErrorList(ErrorList.CODES.NOT_FOUND));
+		}
+		
+		return res.json({result: hash});
+	});
+	
+	app.post('/api/reset', async (req, res, next) => {
+		if (!req.body.hash || !req.body.oldpassword || !req.body.newpassword || !req.body.repeat_newpassword || !req.body.userid) {
+			throw new ErrorList(ErrorList.CODES.REQUIRED_FIELD);
+		}
+		
+		if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]){8,}/g.test(req.body.oldpassword)) {
+			throw new ErrorList(ErrorList.CODES.NOT_VALID_PASSWORD);
+		}
+		
+		if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]){8,}/g.test(req.body.newpassword)) {
+			throw new ErrorList(ErrorList.CODES.NOT_VALID_PASSWORD);
+		}
+		
+		if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]){8,}/g.test(req.body.repeat_newpassword)) {
+			throw new ErrorList(ErrorList.CODES.NOT_VALID_PASSWORD);
+		}
+		
+		if (req.body.newpassword !== req.body.repeat_newpassword) {
+			throw new ErrorList(ErrorList.CODES.PASSWORD_MISMATCH);
+		}
+		
+		let hash = await Request.findOne({user: req.body.userid, code: req.query.hash});
+		
+		if (!hash) {
+			throw new ErrorList(ErrorList.CODES.NOT_FOUND);
+		}
+		
+		let user = await User.findOne({_id: req.body.userid, password: md5(req.body.oldpassword)});
+		
+		if (!user) {
+			throw new ErrorList(ErrorList.CODES.NOT_FOUND);
+		}
+		
+		user.password = md5(req.body.repeat_newpassword);
+		
+		await user.save();
+		
+		let objectUser = {
+			_id: user._id,
+			active: user.active,
+			login: user.login,
+			name: user.name,
+			surname: user.surname,
+			__v: user.__v,
+		};
+		
+		return res.json({profile: objectUser});
 	});
 	
 	app.use((err, req, res, next) => {

@@ -116,7 +116,7 @@
 				this.$router.push('/registration');
 			},
 			forgot__password() {
-				this.$router.push('/forgot__password');
+				this.$router.push('/forgot');
 			},
 			errorShow(filed, type) {
 				const errors = [];

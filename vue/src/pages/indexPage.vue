@@ -78,7 +78,7 @@
 				this.$router.push('/registration');
 			},
 			forgot__password() {
-				this.$router.push('/forgot__password');
+				this.$router.push('/forgot');
 			},
 			logout() {
 				return this.$http.post(this.$address + '/logout')

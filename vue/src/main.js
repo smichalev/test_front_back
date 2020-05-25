@@ -6,7 +6,7 @@ import vuetify from './plugins/vuetify';
 import axios from './plugins/axios';
 
 Vue.prototype.$http = axios;
-Vue.prototype.$address = 'http://localhost:7777/api';
+Vue.prototype.$address = 'http://127.0.0.1:7777/api';
 Vue.config.productionTip = false;
 
 new Vue({
