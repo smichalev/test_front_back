@@ -91,7 +91,7 @@
 					</v-form>
 					<v-divider></v-divider>
 					<v-card-actions>
-						<v-btn color="success" elevation="0" block @click="registrationAccount">Регистрация</v-btn>
+						<v-btn color="success" elevation="0" block @click="registrationAccount" :loading="loading">Регистрация</v-btn>
 					</v-card-actions>
 				</v-card>
 			</v-col>
@@ -115,6 +115,7 @@
 		name: 'registration',
 		data() {
 			return {
+				loading: false,
 				listError: [],
 				login: null,
 				password: null,
@@ -136,6 +137,7 @@
 			},
 			registrationAccount() {
 				this.$v.$touch();
+				this.loading = true;
 				this.listError = [];
 				this.$http.post(this.$address + '/registration', {
 						login: this.login,
@@ -145,10 +147,12 @@
 						surname: this.surname,
 					})
 					.then((data) => {
+						this.loading = false;
 						this.$store.commit('LOGIN', data.data.profile);
 						this.$router.push('/');
 					})
 					.catch((err) => {
+						this.loading = false;
 						this.listError.push(err.response.data.error.message);
 					});
 			},

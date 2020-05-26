@@ -6,6 +6,7 @@ import loginRouter from './loginRouter';
 import registrationRouter from './registrationRouter';
 import forgotPasswordRouter from "./forgotPasswordRouter";
 import resetRouter from "./resetRouter";
+import activeRouter from "./activeRouter";
 
 Vue.use(Router);
 
@@ -17,5 +18,6 @@ export default new Router({
 		...registrationRouter,
 		...forgotPasswordRouter,
 		...resetRouter,
+		...activeRouter,
 	],
 });

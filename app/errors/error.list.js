@@ -8,6 +8,10 @@ const CODES = {
 	REQUIRED_FIELD: 6,
 	NOT_VALID_EMAIL: 7,
 	NOT_VALID_PASSWORD: 8,
+	NOT_FOUND_USER: 9,
+	NOT_FOUND_HASH: 10,
+	PREVIOUS_PASSWORD_WAS_DIFFERENT: 11,
+	NOT_FOUND_HASH_ACTIVE: 12,
 };
 const messages = {
 	[CODES.UNKNOWN_ERROR]: {
@@ -45,6 +49,22 @@ const messages = {
 	[CODES.NOT_VALID_PASSWORD]: {
 		status: 400,
 		message: `Пароль не валиден! Пример валидного пароля: Qq123456`,
+	},
+	[CODES.NOT_FOUND_USER]: {
+		status: 404,
+		message: `Пользователь не найден`,
+	},
+	[CODES.NOT_FOUND_HASH]: {
+		status: 404,
+		message: `Код для восстановления пароля не был сгенерирован или по нему уже было осуществленно восстановление`,
+	},
+	[CODES.NOT_FOUND_HASH_ACTIVE]: {
+		status: 404,
+		message: `Код для активации аакаунта не был сгенерирован или по нему уже была осуществленна активация`,
+	},
+	[CODES.PREVIOUS_PASSWORD_WAS_DIFFERENT]: {
+		status: 400,
+		message: `Прежний пароль отличается от введенного`,
 	},
 };
 

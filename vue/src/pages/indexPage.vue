@@ -34,6 +34,9 @@
 									<v-chip v-if="profile.active" label color="success" small>Активен</v-chip>
 									<v-chip v-else label color="error" small>Не активен</v-chip>
 								</v-list-item-subtitle>
+								<v-list-item-subtitle v-if="!profile.active" class="mt-2">
+									Для активации проверьте свой почтовый адрес.
+								</v-list-item-subtitle>
 							</v-list-item-content>
 						</v-list-item>
 						<v-list-item two-line v-if="profile">
