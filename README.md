@@ -23,4 +23,6 @@ Authorization / Registration Express + MongoDB + Vue + Vuetify
 
 Перейти на 127.0.0.1:НОВЫЙ ПОРТ для проверки приложения.
 
+Могут быть проблемы по отправке почты, так как не стал заморачиваться и ставить smtp сервер, а просто воспользовался яндексом
+
 ![Image](https://i.ibb.co/0YKvTrH/screen.png)
