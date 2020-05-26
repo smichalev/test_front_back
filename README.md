@@ -22,3 +22,5 @@ Authorization / Registration Express + MongoDB + Vue + Vuetify
 Запустить npm start
 
 Перейти на 127.0.0.1:НОВЫЙ ПОРТ для проверки приложения.
+
+![Image](https://i.ibb.co/0YKvTrH/screen.png)
